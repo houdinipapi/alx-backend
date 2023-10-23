@@ -67,7 +67,7 @@ class Server:
             return []
 
         idx_range = index_range(page, page_size)
-        data = self.__dataset[idx_range[0] : idx_range[1]]
+        data = self.__dataset[idx_range[0]:idx_range[1]]
         return data
 
     def get_hyper(self, page: int = 1, page_size: int = 10) -> dict:
