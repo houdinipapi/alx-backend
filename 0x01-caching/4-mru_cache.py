@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+
 """
-MRUCache module
+MRU caching
 """
 
 from base_caching import BaseCaching
@@ -8,34 +9,59 @@ from base_caching import BaseCaching
 
 class MRUCache(BaseCaching):
     """
-    MRUCache class
+    MRU Cache class definition
+
+    Args:
+        BaseCaching (obj): parent class
     """
 
     def __init__(self):
-        """
-        Initialize an MRUCache instance
-        """
         super().__init__()
+        self.stack = []
 
     def put(self, key, item):
         """
-        Add an item to the cache using MRU algorithm
+        add item to storage
+
+        Args:
+            key (str): key
+            item (str): corresponding value at key
         """
-        if key is not None and item is not None:
-            if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                mru_key = max(self.cache_data,
-                              key=lambda k: self.cache_data[k])
-                print("DISCARD:", mru_key)
-                del self.cache_data[mru_key]
-            self.cache_data[key] = item
+        if not key or not item:
+            return
+
+        updated = True if key in self.cache_data.keys() else False
+
+        self.cache_data[key] = item
+
+        self.stack.append(key)
+
+        if updated:
+            self.updated_key = key
+            first_index_of_key = self.stack.index(key)
+            del self.stack[first_index_of_key]
+            return
+
+        if len(self.cache_data) > self.MAX_ITEMS:
+            del self.cache_data[self.stack[-2]]
+            print(f"DISCARD: {self.stack[-2]}")
+            del self.stack[-2]
 
     def get(self, key):
         """
-        Get an item from the cache by key and update the usage
+        get value at key
+
+        Args:
+            key (str): key
+
+        Returns:
+            str: value if successful else None
         """
-        if key is not None:
-            item = self.cache_data.get(key)
-            if item:
-                del self.cache_data[key]
-                self.cache_data[key] = item
-            return item
+        if key not in self.cache_data.keys():
+            return None
+
+        self.stack.append(key)
+        first_index_of_key = self.stack.index(key)
+        del self.stack[first_index_of_key]
+
+        return self.cache_data.get(key)
