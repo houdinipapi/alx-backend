@@ -16,7 +16,6 @@ class MRUCache(BaseCaching):
         Initialize an MRUCache instance
         """
         super().__init__()
-        self.order = []
 
     def put(self, key, item):
         """
@@ -24,19 +23,19 @@ class MRUCache(BaseCaching):
         """
         if key is not None and item is not None:
             if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                mru_key = self.order.pop()
-                self.cache_data.pop(mru_key)
+                mru_key = max(self.cache_data,
+                              key=lambda k: self.cache_data[k])
                 print("DISCARD:", mru_key)
+                del self.cache_data[mru_key]
             self.cache_data[key] = item
-            self.order.insert(0, key)
 
     def get(self, key):
         """
-        Get an item from the cache by key and update the order
+        Get an item from the cache by key and update the usage
         """
         if key is not None:
             item = self.cache_data.get(key)
             if item:
-                self.order.remove(key)
-                self.order.insert(0, key)
+                del self.cache_data[key]
+                self.cache_data[key] = item
             return item
