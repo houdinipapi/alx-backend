@@ -35,13 +35,17 @@ def get_locale():
     Returns:
         str: best match
     """
+    locale = request.args.get('locale')
+    if locale in app.config['LANGUAGES']:
+        return locale
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-# uncomment this line and comment the @babel.localeselector
+# --- uncomment this line
+# babel.init_app(app, locale_selector=get_locale)
+# --- and comment the @babel.localeselector decorator above if
 # you get this error:
 # AttributeError: 'Babel' object has no attribute 'localeselector'
-# babel.init_app(app, locale_selector=get_locale)
 
 if __name__ == '__main__':
     app.run()
